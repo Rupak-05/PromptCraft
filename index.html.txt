@@ -1,0 +1,2513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Svarna - AI Calorie Tracker | Indian Cuisine</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Inter:wght@300;400;500;600;700&family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --gold: #FFD700;
+            --gold-light: #FFF8DC;
+            --gold-dark: #B8860B;
+            --gold-dim: #8B6914;
+            --black: #050505;
+            --black-light: #0a0a0a;
+            --black-card: #111111;
+            --black-elevated: #1a1a1a;
+            --red: #FF3366;
+            --red-glow: rgba(255, 51, 102, 0.3);
+            --emerald: #00D9A5;
+            --emerald-glow: rgba(0, 217, 165, 0.3);
+            --purple: #A855F7;
+            --purple-glow: rgba(168, 85, 247, 0.3);
+            --cyan: #06B6D4;
+            --orange: #F97316;
+            --white: #ffffff;
+            --gray: #888888;
+            --gray-dark: #333333;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--black);
+            color: var(--white);
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--black);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--gold-dark);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--gold);
+        }
+
+        /* Animated Background */
+        .bg-particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--gold);
+            border-radius: 50%;
+            opacity: 0;
+            animation: floatParticle 15s infinite;
+        }
+
+        @keyframes floatParticle {
+            0% { transform: translateY(100vh) translateX(0); opacity: 0; }
+            10% { opacity: 0.8; }
+            90% { opacity: 0.8; }
+            100% { transform: translateY(-10vh) translateX(100px); opacity: 0; }
+        }
+
+        /* Grid Overlay */
+        .grid-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(255, 215, 0, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 215, 0, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* Glowing Orbs */
+        .orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            pointer-events: none;
+            z-index: 0;
+            animation: orbFloat 20s ease-in-out infinite;
+        }
+
+        .orb-1 {
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(255, 215, 0, 0.15), transparent 70%);
+            top: -100px;
+            right: -100px;
+        }
+
+        .orb-2 {
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(255, 51, 102, 0.1), transparent 70%);
+            bottom: 10%;
+            left: -50px;
+            animation-delay: -5s;
+        }
+
+        .orb-3 {
+            width: 250px;
+            height: 250px;
+            background: radial-gradient(circle, rgba(0, 217, 165, 0.08), transparent 70%);
+            top: 40%;
+            right: 10%;
+            animation-delay: -10s;
+        }
+
+        @keyframes orbFloat {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(30px, -30px) scale(1.1); }
+            66% { transform: translate(-20px, 20px) scale(0.9); }
+        }
+
+        /* Navigation */
+        .nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 1.5rem 3rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            background: rgba(5, 5, 5, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 215, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .nav.scrolled {
+            padding: 1rem 3rem;
+            background: rgba(5, 5, 5, 0.95);
+        }
+
+        .logo {
+            font-family: 'Cinzel', serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--gold);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            position: relative;
+        }
+
+        .logo::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--gold);
+            transition: width 0.3s ease;
+        }
+
+        .logo:hover::after {
+            width: 100%;
+        }
+
+        .logo i {
+            font-size: 1.5rem;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2.5rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--gray);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+            position: relative;
+            padding: 0.5rem 0;
+        }
+
+        .nav-links a::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 2px;
+            background: var(--gold);
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
+        }
+
+        .nav-links a:hover {
+            color: var(--gold);
+        }
+
+        .nav-links a:hover::before {
+            width: 100%;
+        }
+
+        .nav-links a.active {
+            color: var(--gold);
+        }
+
+        .nav-links a.active::before {
+            width: 100%;
+        }
+
+        /* Main Content */
+        .main-content {
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8rem 2rem 4rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-content {
+            text-align: center;
+            max-width: 900px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1.5rem;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            border-radius: 50px;
+            font-size: 0.85rem;
+            color: var(--gold);
+            margin-bottom: 2rem;
+            animation: fadeInDown 1s ease;
+            background: rgba(255, 215, 0, 0.05);
+        }
+
+        .hero-badge i {
+            animation: spin 3s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .hero h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 5rem;
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 50%, var(--gold) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: fadeInUp 1s ease 0.2s both, shimmer 3s infinite;
+            background-size: 200% auto;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: 0% center; }
+            100% { background-position: 200% center; }
+        }
+
+        .hero-subtitle {
+            font-size: 1.3rem;
+            color: var(--gray);
+            margin-bottom: 3rem;
+            animation: fadeInUp 1s ease 0.4s both;
+            font-weight: 300;
+        }
+
+        .hero-stats {
+            display: flex;
+            justify-content: center;
+            gap: 4rem;
+            margin-bottom: 3rem;
+            animation: fadeInUp 1s ease 0.6s both;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--gold);
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--gray);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .hero-cta {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            animation: fadeInUp 1s ease 0.8s both;
+        }
+
+        .btn {
+            padding: 1rem 2.5rem;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            border: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+            color: var(--black);
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 40px rgba(255, 215, 0, 0.5);
+        }
+
+        .btn-primary::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transform: rotate(45deg);
+            transition: all 0.5s ease;
+        }
+
+        .btn-primary:hover::after {
+            left: 100%;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--gold);
+            border: 2px solid var(--gold);
+        }
+
+        .btn-secondary:hover {
+            background: var(--gold);
+            color: var(--black);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 40px rgba(255, 215, 0, 0.3);
+        }
+
+        /* Floating Cards */
+        .floating-cards {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .float-card {
+            position: absolute;
+            background: var(--black-card);
+            border: 1px solid rgba(255, 215, 0, 0.1);
+            border-radius: 16px;
+            padding: 1.5rem;
+            width: 220px;
+            animation: float 6s ease-in-out infinite;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        }
+
+        .float-card:nth-child(1) {
+            top: 20%;
+            left: 5%;
+            animation-delay: 0s;
+            border-color: rgba(255, 51, 102, 0.2);
+        }
+
+        .float-card:nth-child(2) {
+            top: 60%;
+            right: 5%;
+            animation-delay: -2s;
+            border-color: rgba(0, 217, 165, 0.2);
+        }
+
+        .float-card:nth-child(3) {
+            bottom: 15%;
+            left: 10%;
+            animation-delay: -4s;
+            border-color: rgba(168, 85, 247, 0.2);
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(2deg); }
+        }
+
+        .float-card-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .float-card-title {
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+            font-size: 0.9rem;
+        }
+
+        .float-card-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--gold);
+        }
+
+        /* Section Styles */
+        .section {
+            padding: 6rem 2rem;
+            position: relative;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .section-tag {
+            display: inline-block;
+            padding: 0.4rem 1.2rem;
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            border-radius: 50px;
+            font-size: 0.8rem;
+            color: var(--gold);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 1rem;
+        }
+
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--white), var(--gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .section-desc {
+            color: var(--gray);
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Dashboard */
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: var(--black-card);
+            border: 1px solid rgba(255, 215, 0, 0.08);
+            border-radius: 24px;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s ease;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, var(--gold), var(--gold-dark), var(--gold));
+            transform: scaleX(0);
+            transition: transform 0.4s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(255, 215, 0, 0.2);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 30px rgba(255, 215, 0, 0.05);
+        }
+
+        .card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--white);
+        }
+
+        .card-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+        }
+
+        .icon-gold { background: rgba(255, 215, 0, 0.1); color: var(--gold); }
+        .icon-red { background: rgba(255, 51, 102, 0.1); color: var(--red); }
+        .icon-emerald { background: rgba(0, 217, 165, 0.1); color: var(--emerald); }
+        .icon-purple { background: rgba(168, 85, 247, 0.1); color: var(--purple); }
+
+        /* Circular Progress */
+        .circular-progress {
+            position: relative;
+            width: 180px;
+            height: 180px;
+            margin: 0 auto 1.5rem;
+        }
+
+        .circular-progress svg {
+            transform: rotate(-90deg);
+        }
+
+        .progress-bg {
+            fill: none;
+            stroke: rgba(255, 215, 0, 0.1);
+            stroke-width: 8;
+        }
+
+        .progress-bar {
+            fill: none;
+            stroke: url(#goldGradient);
+            stroke-width: 8;
+            stroke-linecap: round;
+            stroke-dasharray: 440;
+            stroke-dashoffset: 440;
+            transition: stroke-dashoffset 2s ease;
+        }
+
+        .progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        .progress-value {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--gold);
+        }
+
+        .progress-label {
+            font-size: 0.8rem;
+            color: var(--gray);
+        }
+
+        /* Macro Bars */
+        .macro-item {
+            margin-bottom: 1.2rem;
+        }
+
+        .macro-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .macro-name {
+            color: var(--gray);
+        }
+
+        .macro-value {
+            color: var(--white);
+            font-weight: 600;
+        }
+
+        .macro-bar {
+            height: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .macro-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 1.5s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .macro-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shimmerBar 2s infinite;
+        }
+
+        @keyframes shimmerBar {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .fill-protein { background: linear-gradient(90deg, var(--red), #FF6B8A); }
+        .fill-carbs { background: linear-gradient(90deg, var(--emerald), #4EE8C2); }
+        .fill-fat { background: linear-gradient(90deg, var(--purple), #C084FC); }
+
+        /* Food Grid */
+        .food-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .food-card {
+            background: var(--black-card);
+            border: 1px solid rgba(255, 215, 0, 0.08);
+            border-radius: 20px;
+            overflow: hidden;
+            transition: all 0.4s ease;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .food-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            border-color: rgba(255, 215, 0, 0.3);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.6), 0 0 40px rgba(255, 215, 0, 0.08);
+        }
+
+        .food-image {
+            height: 180px;
+            background: linear-gradient(135deg, var(--black-elevated), var(--black-light));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .food-image::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 50%;
+            background: linear-gradient(to top, var(--black-card), transparent);
+        }
+
+        .food-calorie-badge {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(255, 215, 0, 0.15);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            padding: 0.4rem 0.8rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--gold);
+            z-index: 2;
+        }
+
+        .food-info {
+            padding: 1.5rem;
+        }
+
+        .food-name {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 0.3rem;
+            color: var(--white);
+        }
+
+        .food-region {
+            font-size: 0.8rem;
+            color: var(--gray);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .food-macros {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .food-macro {
+            text-align: center;
+            flex: 1;
+            padding: 0.5rem;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+        }
+
+        .food-macro-value {
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        .food-macro-label {
+            font-size: 0.7rem;
+            color: var(--gray);
+            text-transform: uppercase;
+        }
+
+        .food-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-small {
+            flex: 1;
+            padding: 0.6rem;
+            border-radius: 10px;
+            border: none;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-add {
+            background: var(--gold);
+            color: var(--black);
+        }
+
+        .btn-add:hover {
+            background: var(--gold-light);
+            transform: scale(1.05);
+        }
+
+        .btn-details {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--white);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-details:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* AI Features */
+        .ai-section {
+            background: linear-gradient(180deg, var(--black) 0%, rgba(255, 215, 0, 0.02) 50%, var(--black) 100%);
+        }
+
+        .ai-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .ai-card {
+            background: var(--black-card);
+            border: 1px solid rgba(255, 215, 0, 0.1);
+            border-radius: 24px;
+            padding: 2.5rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s ease;
+        }
+
+        .ai-card:hover {
+            border-color: rgba(255, 215, 0, 0.3);
+            box-shadow: 0 0 60px rgba(255, 215, 0, 0.05);
+        }
+
+        .ai-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 215, 0, 0.03), transparent 70%);
+            animation: aiGlow 8s ease-in-out infinite;
+        }
+
+        @keyframes aiGlow {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(-25%, 25%); }
+        }
+
+        .ai-card-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .ai-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            background: rgba(255, 215, 0, 0.1);
+            color: var(--gold);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+        }
+
+        .ai-card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 0.8rem;
+            color: var(--white);
+        }
+
+        .ai-card p {
+            color: var(--gray);
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .ai-input-group {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .ai-input {
+            flex: 1;
+            padding: 0.8rem 1.2rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: var(--white);
+            font-size: 0.9rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .ai-input:focus {
+            border-color: var(--gold);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.1);
+        }
+
+        .ai-input::placeholder {
+            color: var(--gray);
+        }
+
+        .ai-btn {
+            padding: 0.8rem 1.5rem;
+            background: var(--gold);
+            color: var(--black);
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .ai-btn:hover {
+            background: var(--gold-light);
+            transform: scale(1.05);
+        }
+
+        .ai-result {
+            margin-top: 1.5rem;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 215, 0, 0.1);
+            display: none;
+        }
+
+        .ai-result.show {
+            display: block;
+            animation: fadeInUp 0.5s ease;
+        }
+
+        /* Ingredient Breakdown */
+        .ingredient-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+
+        .ingredient-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .ingredient-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 215, 0, 0.2);
+            transform: translateX(5px);
+        }
+
+        .ingredient-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .ingredient-info {
+            flex: 1;
+        }
+
+        .ingredient-name {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .ingredient-amount {
+            font-size: 0.8rem;
+            color: var(--gray);
+        }
+
+        .ingredient-cal {
+            font-weight: 700;
+            color: var(--gold);
+            font-size: 0.9rem;
+        }
+
+        /* Search & Filter */
+        .search-bar {
+            max-width: 700px;
+            margin: 0 auto 3rem;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 1.2rem 1.5rem 1.2rem 3.5rem;
+            background: var(--black-card);
+            border: 1px solid rgba(255, 215, 0, 0.15);
+            border-radius: 50px;
+            color: var(--white);
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            border-color: var(--gold);
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 1.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gold);
+            font-size: 1.2rem;
+        }
+
+        .filter-tags {
+            display: flex;
+            justify-content: center;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+            margin-bottom: 3rem;
+        }
+
+        .filter-tag {
+            padding: 0.6rem 1.2rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50px;
+            color: var(--gray);
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        .filter-tag:hover, .filter-tag.active {
+            background: rgba(255, 215, 0, 0.1);
+            color: var(--gold);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+        }
+
+        /* Meal Log */
+        .meal-log {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .meal-item {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            padding: 1.5rem;
+            background: var(--black-card);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .meal-item:hover {
+            border-color: rgba(255, 215, 0, 0.2);
+            transform: translateX(5px);
+        }
+
+        .meal-time {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            flex-shrink: 0;
+        }
+
+        .meal-time-hour {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--gold);
+        }
+
+        .meal-time-ampm {
+            font-size: 0.7rem;
+            color: var(--gray);
+        }
+
+        .meal-details {
+            flex: 1;
+        }
+
+        .meal-name {
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+        }
+
+        .meal-calories {
+            font-size: 0.85rem;
+            color: var(--gray);
+        }
+
+        .meal-delete {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(255, 51, 102, 0.1);
+            border: 1px solid rgba(255, 51, 102, 0.2);
+            color: var(--red);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .meal-delete:hover {
+            background: var(--red);
+            color: var(--white);
+            transform: rotate(90deg);
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal {
+            background: var(--black-card);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            border-radius: 24px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+            padding: 2.5rem;
+            position: relative;
+            animation: modalIn 0.4s ease;
+        }
+
+        @keyframes modalIn {
+            from { opacity: 0; transform: scale(0.9) translateY(20px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--gray);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .modal-close:hover {
+            background: var(--red);
+            color: var(--white);
+            transform: rotate(90deg);
+        }
+
+        .modal-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+            color: var(--gold);
+        }
+
+        .modal-subtitle {
+            color: var(--gray);
+            margin-bottom: 2rem;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Scroll Reveal */
+        .reveal {
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 0.8s ease;
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 3rem; }
+            .section-title { font-size: 2.5rem; }
+            .nav-links { display: none; }
+            .hero-stats { gap: 2rem; }
+            .hero-cta { flex-direction: column; align-items: center; }
+            .floating-cards { display: none; }
+            .dashboard { grid-template-columns: 1fr; }
+            .food-grid { grid-template-columns: 1fr; }
+            .ai-grid { grid-template-columns: 1fr; }
+        }
+
+        /* Loading Animation */
+        .loading-dots {
+            display: flex;
+            gap: 0.3rem;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .loading-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--gold);
+            border-radius: 50%;
+            animation: bounce 1.4s ease-in-out infinite;
+        }
+
+        .loading-dot:nth-child(1) { animation-delay: 0s; }
+        .loading-dot:nth-child(2) { animation-delay: 0.2s; }
+        .loading-dot:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            padding: 1rem 2rem;
+            background: var(--black-card);
+            border: 1px solid var(--gold);
+            border-radius: 12px;
+            color: var(--gold);
+            font-weight: 600;
+            z-index: 3000;
+            transform: translateX(400px);
+            transition: transform 0.4s ease;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        /* Water Tracker */
+        .water-cups {
+            display: flex;
+            gap: 0.8rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+
+        .water-cup {
+            width: 40px;
+            height: 50px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0 0 20px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .water-cup.filled {
+            border-color: var(--cyan);
+            background: rgba(6, 182, 212, 0.2);
+        }
+
+        .water-cup.filled::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--cyan);
+            opacity: 0.3;
+            animation: waterFill 0.5s ease;
+        }
+
+        @keyframes waterFill {
+            from { height: 0; }
+            to { height: 100%; }
+        }
+
+        /* Footer */
+        .footer {
+            padding: 4rem 2rem 2rem;
+            border-top: 1px solid rgba(255, 215, 0, 0.1);
+            text-align: center;
+        }
+
+        .footer-logo {
+            font-family: 'Cinzel', serif;
+            font-size: 2rem;
+            color: var(--gold);
+            margin-bottom: 1rem;
+        }
+
+        .footer-text {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        /* Tooltip */
+        .tooltip {
+            position: relative;
+        }
+
+        .tooltip::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%) translateY(-5px);
+            padding: 0.5rem 1rem;
+            background: var(--black-elevated);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            border-radius: 8px;
+            font-size: 0.8rem;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s ease;
+        }
+
+        .tooltip:hover::after {
+            opacity: 1;
+            transform: translateX(-50%) translateY(-10px);
+        }
+    </style>
+<base target="_blank">
+</head>
+<body>
+    <!-- Background Effects -->
+    <div class="bg-particles" id="particles"></div>
+    <div class="grid-overlay"></div>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+
+    <!-- SVG Gradient Definitions -->
+    <svg width="0" height="0">
+        <defs>
+            <linearGradient id="goldGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" style="stop-color:#FFD700"/>
+                <stop offset="50%" style="stop-color:#FFF8DC"/>
+                <stop offset="100%" style="stop-color:#FFD700"/>
+            </linearGradient>
+        </defs>
+    </svg>
+
+    <!-- Navigation -->
+    <nav class="nav" id="navbar">
+        <a href="#" class="logo">
+            <i class="fas fa-crown"></i>
+            Svarna
+        </a>
+        <ul class="nav-links">
+            <li><a href="#dashboard" class="active">Dashboard</a></li>
+            <li><a href="#foods">Foods</a></li>
+            <li><a href="#ai">AI Tools</a></li>
+            <li><a href="#log">My Log</a></li>
+        </ul>
+    </nav>
+
+    <div class="main-content">
+        <!-- Hero Section -->
+        <section class="hero" id="home">
+            <div class="floating-cards">
+                <div class="float-card">
+                    <div class="float-card-icon">🍛</div>
+                    <div class="float-card-title">Butter Chicken</div>
+                    <div class="float-card-value">485 kcal</div>
+                </div>
+                <div class="float-card">
+                    <div class="float-card-icon">🥘</div>
+                    <div class="float-card-title">Biryani</div>
+                    <div class="float-card-value">520 kcal</div>
+                </div>
+                <div class="float-card">
+                    <div class="float-card-icon">🍞</div>
+                    <div class="float-card-title">Naan</div>
+                    <div class="float-card-value">260 kcal</div>
+                </div>
+            </div>
+
+            <div class="hero-content">
+                <div class="hero-badge">
+                    <i class="fas fa-sparkles"></i>
+                    AI-Powered Nutrition
+                </div>
+                <h1>Track Every Bite<br>With Intelligence</h1>
+                <p class="hero-subtitle">
+                    Discover the calories in every Indian dish, from rich Butter Chicken to humble Dal. 
+                    AI-powered insights for your desi diet.
+                </p>
+                <div class="hero-stats">
+                    <div class="stat-item">
+                        <span class="stat-number" id="statFoods">150+</span>
+                        <span class="stat-label">Indian Dishes</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number" id="statIngredients">500+</span>
+                        <span class="stat-label">Ingredients</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number" id="statUsers">50K+</span>
+                        <span class="stat-label">Active Users</span>
+                    </div>
+                </div>
+                <div class="hero-cta">
+                    <a href="#dashboard" class="btn btn-primary">
+                        <i class="fas fa-chart-pie"></i>
+                        Start Tracking
+                    </a>
+                    <a href="#foods" class="btn btn-secondary">
+                        <i class="fas fa-search"></i>
+                        Explore Foods
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Dashboard Section -->
+        <section class="section" id="dashboard">
+            <div class="section-header reveal">
+                <span class="section-tag">Your Daily Overview</span>
+                <h2 class="section-title">Dashboard</h2>
+                <p class="section-desc">Monitor your daily nutrition with real-time insights and AI recommendations.</p>
+            </div>
+
+            <div class="dashboard">
+                <!-- Calories Card -->
+                <div class="card reveal">
+                    <div class="card-header">
+                        <span class="card-title">Calories</span>
+                        <div class="card-icon icon-gold">
+                            <i class="fas fa-fire"></i>
+                        </div>
+                    </div>
+                    <div class="circular-progress">
+                        <svg width="180" height="180">
+                            <circle class="progress-bg" cx="90" cy="90" r="70"></circle>
+                            <circle class="progress-bar" id="calProgress" cx="90" cy="90" r="70"></circle>
+                        </svg>
+                        <div class="progress-text">
+                            <div class="progress-value" id="calValue">0</div>
+                            <div class="progress-label">/ 2000 kcal</div>
+                        </div>
+                    </div>
+                    <div style="text-align: center; color: var(--gray); font-size: 0.9rem;">
+                        <span id="calRemaining">2000</span> kcal remaining
+                    </div>
+                </div>
+
+                <!-- Macros Card -->
+                <div class="card reveal">
+                    <div class="card-header">
+                        <span class="card-title">Macronutrients</span>
+                        <div class="card-icon icon-red">
+                            <i class="fas fa-drumstick-bite"></i>
+                        </div>
+                    </div>
+                    <div class="macro-item">
+                        <div class="macro-header">
+                            <span class="macro-name">Protein</span>
+                            <span class="macro-value"><span id="proteinVal">0</span>g / 150g</span>
+                        </div>
+                        <div class="macro-bar">
+                            <div class="macro-fill fill-protein" id="proteinBar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    <div class="macro-item">
+                        <div class="macro-header">
+                            <span class="macro-name">Carbs</span>
+                            <span class="macro-value"><span id="carbsVal">0</span>g / 250g</span>
+                        </div>
+                        <div class="macro-bar">
+                            <div class="macro-fill fill-carbs" id="carbsBar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    <div class="macro-item">
+                        <div class="macro-header">
+                            <span class="macro-name">Fat</span>
+                            <span class="macro-value"><span id="fatVal">0</span>g / 65g</span>
+                        </div>
+                        <div class="macro-bar">
+                            <div class="macro-fill fill-fat" id="fatBar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Water Tracker -->
+                <div class="card reveal">
+                    <div class="card-header">
+                        <span class="card-title">Hydration</span>
+                        <div class="card-icon icon-emerald">
+                            <i class="fas fa-tint"></i>
+                        </div>
+                    </div>
+                    <div style="text-align: center; margin-bottom: 1rem;">
+                        <div style="font-size: 2.5rem; font-weight: 700; color: var(--cyan);" id="waterCount">0</div>
+                        <div style="color: var(--gray); font-size: 0.9rem;">/ 8 glasses</div>
+                    </div>
+                    <div class="water-cups" id="waterCups">
+                        <!-- Generated by JS -->
+                    </div>
+                </div>
+
+                <!-- Quick Stats -->
+                <div class="card reveal">
+                    <div class="card-header">
+                        <span class="card-title">Today's Summary</span>
+                        <div class="card-icon icon-purple">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div style="text-align: center; padding: 1rem; background: rgba(255,255,255,0.03); border-radius: 12px;">
+                            <div style="font-size: 1.5rem; font-weight: 700; color: var(--gold);" id="mealsCount">0</div>
+                            <div style="font-size: 0.8rem; color: var(--gray);">Meals</div>
+                        </div>
+                        <div style="text-align: center; padding: 1rem; background: rgba(255,255,255,0.03); border-radius: 12px;">
+                            <div style="font-size: 1.5rem; font-weight: 700; color: var(--emerald);" id="avgCal">0</div>
+                            <div style="font-size: 0.8rem; color: var(--gray);">Avg/Meal</div>
+                        </div>
+                        <div style="text-align: center; padding: 1rem; background: rgba(255,255,255,0.03); border-radius: 12px;">
+                            <div style="font-size: 1.5rem; font-weight: 700; color: var(--red);" id="burnTarget">500</div>
+                            <div style="font-size: 0.8rem; color: var(--gray);">Burn Target</div>
+                        </div>
+                        <div style="text-align: center; padding: 1rem; background: rgba(255,255,255,0.03); border-radius: 12px;">
+                            <div style="font-size: 1.5rem; font-weight: 700; color: var(--purple);" id="streakDays">3</div>
+                            <div style="font-size: 0.8rem; color: var(--gray);">Day Streak</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Foods Section -->
+        <section class="section" id="foods">
+            <div class="section-header reveal">
+                <span class="section-tag">Indian Cuisine Database</span>
+                <h2 class="section-title">Explore Foods</h2>
+                <p class="section-desc">From street food to royal feasts — every calorie counted, every ingredient tracked.</p>
+            </div>
+
+            <div class="search-bar reveal">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" class="search-input" id="foodSearch" placeholder="Search dishes, ingredients, regions...">
+            </div>
+
+            <div class="filter-tags reveal">
+                <button class="filter-tag active" data-filter="all">All</button>
+                <button class="filter-tag" data-filter="north">North Indian</button>
+                <button class="filter-tag" data-filter="south">South Indian</button>
+                <button class="filter-tag" data-filter="street">Street Food</button>
+                <button class="filter-tag" data-filter="dessert">Desserts</button>
+                <button class="filter-tag" data-filter="healthy">Healthy</button>
+                <button class="filter-tag" data-filter="beverage">Beverages</button>
+            </div>
+
+            <div class="food-grid" id="foodGrid">
+                <!-- Food cards generated by JS -->
+            </div>
+        </section>
+
+        <!-- AI Section -->
+        <section class="section ai-section" id="ai">
+            <div class="section-header reveal">
+                <span class="section-tag">Powered by Intelligence</span>
+                <h2 class="section-title">AI Features</h2>
+                <p class="section-desc">Smart tools to make calorie tracking effortless and insightful.</p>
+            </div>
+
+            <div class="ai-grid">
+                <!-- AI Estimator -->
+                <div class="ai-card reveal">
+                    <div class="ai-card-content">
+                        <div class="ai-icon">
+                            <i class="fas fa-brain"></i>
+                        </div>
+                        <h3>AI Calorie Estimator</h3>
+                        <p>Describe your meal in natural language and our AI will estimate calories, macros, and ingredients instantly.</p>
+                        <div class="ai-input-group">
+                            <input type="text" class="ai-input" id="aiEstimateInput" placeholder="e.g., 2 rotis with dal and rice...">
+                            <button class="ai-btn" onclick="estimateCalories()">
+                                <i class="fas fa-wand-magic-sparkles"></i>
+                            </button>
+                        </div>
+                        <div class="ai-result" id="estimateResult">
+                            <!-- Results -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Meal Suggester -->
+                <div class="ai-card reveal">
+                    <div class="ai-card-content">
+                        <div class="ai-icon">
+                            <i class="fas fa-utensils"></i>
+                        </div>
+                        <h3>Smart Meal Suggester</h3>
+                        <p>Get personalized Indian meal suggestions based on your remaining calories and macro goals.</p>
+                        <div class="ai-input-group">
+                            <input type="text" class="ai-input" id="aiSuggestInput" placeholder="Remaining calories..." value="800">
+                            <button class="ai-btn" onclick="suggestMeals()">
+                                <i class="fas fa-lightbulb"></i>
+                            </button>
+                        </div>
+                        <div class="ai-result" id="suggestResult">
+                            <!-- Results -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ingredient Analyzer -->
+                <div class="ai-card reveal">
+                    <div class="ai-card-content">
+                        <div class="ai-icon">
+                            <i class="fas fa-microscope"></i>
+                        </div>
+                        <h3>Ingredient Analyzer</h3>
+                        <p>Enter a dish name to get a complete breakdown of ingredients with individual calorie contributions.</p>
+                        <div class="ai-input-group">
+                            <input type="text" class="ai-input" id="aiIngredientInput" placeholder="e.g., Paneer Tikka...">
+                            <button class="ai-btn" onclick="analyzeIngredients()">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                        <div class="ai-result" id="ingredientResult">
+                            <!-- Results -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Meal Log Section -->
+        <section class="section" id="log">
+            <div class="section-header reveal">
+                <span class="section-tag">Your Journey</span>
+                <h2 class="section-title">Today's Log</h2>
+                <p class="section-desc">Everything you've eaten today, beautifully organized.</p>
+            </div>
+
+            <div class="meal-log" id="mealLog">
+                <div style="text-align: center; padding: 4rem; color: var(--gray);">
+                    <i class="fas fa-bowl-food" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                    <p>No meals logged yet. Add some food from the Explore section!</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-logo">Svarna</div>
+            <p class="footer-text">AI-Powered Calorie Tracking for Indian Cuisine</p>
+            <p class="footer-text" style="margin-top: 0.5rem; font-size: 0.8rem;">Made with <i class="fas fa-heart" style="color: var(--red);"></i> for desi food lovers</p>
+        </footer>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal-overlay" id="modal" onclick="closeModal(event)">
+        <div class="modal" onclick="event.stopPropagation()">
+            <button class="modal-close" onclick="closeModal()">
+                <i class="fas fa-times"></i>
+            </button>
+            <div id="modalContent">
+                <!-- Dynamic content -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div class="notification" id="notification">
+        <i class="fas fa-check-circle"></i>
+        <span id="notifText">Added to log!</span>
+    </div>
+
+    <script>
+        // ==================== DATA ====================
+        const indianFoods = [
+            {
+                id: 1, name: "Butter Chicken", emoji: "🍛", region: "North Indian", category: "north",
+                calories: 485, protein: 28, carbs: 14, fat: 35,
+                ingredients: [
+                    { name: "Chicken", amount: "150g", cal: 248, icon: "🍗" },
+                    { name: "Butter", amount: "30g", cal: 215, icon: "🧈" },
+                    { name: "Cream", amount: "50ml", cal: 120, icon: "🥛" },
+                    { name: "Tomato Puree", amount: "100g", cal: 40, icon: "🍅" },
+                    { name: "Onion", amount: "50g", cal: 20, icon: "🧅" },
+                    { name: "Spices", amount: "10g", cal: 25, icon: "🌶️" },
+                    { name: "Cashews", amount: "15g", cal: 86, icon: "🥜" }
+                ]
+            },
+            {
+                id: 2, name: "Chicken Biryani", emoji: "🥘", region: "Hyderabadi", category: "north",
+                calories: 520, protein: 25, carbs: 58, fat: 20,
+                ingredients: [
+                    { name: "Basmati Rice", amount: "200g", cal: 260, icon: "🍚" },
+                    { name: "Chicken", amount: "100g", cal: 165, icon: "🍗" },
+                    { name: "Fried Onions", amount: "30g", cal: 90, icon: "🧅" },
+                    { name: "Ghee", amount: "20g", cal: 180, icon: "🧈" },
+                    { name: "Yogurt", amount: "50g", cal: 30, icon: "🥛" },
+                    { name: "Saffron", amount: "pinch", cal: 5, icon: "🌸" },
+                    { name: "Spices", amount: "15g", cal: 40, icon: "🌶️" }
+                ]
+            },
+            {
+                id: 3, name: "Paneer Tikka", emoji: "🧈", region: "North Indian", category: "north",
+                calories: 320, protein: 18, carbs: 12, fat: 22,
+                ingredients: [
+                    { name: "Paneer", amount: "150g", cal: 265, icon: "🧀" },
+                    { name: "Yogurt Marinade", amount: "50g", cal: 30, icon: "🥛" },
+                    { name: "Capsicum", amount: "50g", cal: 10, icon: "🫑" },
+                    { name: "Onion", amount: "30g", cal: 12, icon: "🧅" },
+                    { name: "Spices", amount: "10g", cal: 25, icon: "🌶️" },
+                    { name: "Oil", amount: "10ml", cal: 90, icon: "🫒" }
+                ]
+            },
+            {
+                id: 4, name: "Masala Dosa", emoji: "🥞", region: "South Indian", category: "south",
+                calories: 290, protein: 6, carbs: 45, fat: 10,
+                ingredients: [
+                    { name: "Rice Batter", amount: "150g", cal: 170, icon: "🍚" },
+                    { name: "Urad Dal", amount: "50g", cal: 60, icon: "🫘" },
+                    { name: "Potato Masala", amount: "80g", cal: 80, icon: "🥔" },
+                    { name: "Oil/Ghee", amount: "15ml", cal: 135, icon: "🧈" },
+                    { name: "Coconut Chutney", amount: "30g", cal: 60, icon: "🥥" }
+                ]
+            },
+            {
+                id: 5, name: "Idli (2 pieces)", emoji: "🍙", region: "South Indian", category: "south",
+                calories: 120, protein: 4, carbs: 24, fat: 1,
+                ingredients: [
+                    { name: "Rice Batter", amount: "100g", cal: 110, icon: "🍚" },
+                    { name: "Urad Dal", amount: "30g", cal: 35, icon: "🫘" },
+                    { name: "Coconut Chutney", amount: "20g", cal: 40, icon: "🥥" },
+                    { name: "Sambar", amount: "100ml", cal: 60, icon: "🥣" }
+                ]
+            },
+            {
+                id: 6, name: "Samosa", emoji: "🥟", region: "Street Food", category: "street",
+                calories: 260, protein: 4, carbs: 30, fat: 14,
+                ingredients: [
+                    { name: "Maida Dough", amount: "60g", cal: 210, icon: "🌾" },
+                    { name: "Potato Filling", amount: "80g", cal: 65, icon: "🥔" },
+                    { name: "Peas", amount: "20g", cal: 15, icon: "🫛" },
+                    { name: "Oil (fried)", amount: "15ml", cal: 135, icon: "🫒" },
+                    { name: "Spices", amount: "5g", cal: 10, icon: "🌶️" }
+                ]
+            },
+            {
+                id: 7, name: "Chole Bhature", emoji: "🍛", region: "Punjabi", category: "north",
+                calories: 550, protein: 16, carbs: 72, fat: 22,
+                ingredients: [
+                    { name: "Bhature (2)", amount: "120g", cal: 320, icon: "🍞" },
+                    { name: "Chickpeas", amount: "150g", cal: 180, icon: "🫘" },
+                    { name: "Tomato Onion Gravy", amount: "100g", cal: 60, icon: "🍅" },
+                    { name: "Oil", amount: "20ml", cal: 180, icon: "🫒" },
+                    { name: "Spices", amount: "10g", cal: 25, icon: "🌶️" }
+                ]
+            },
+            {
+                id: 8, name: "Palak Paneer", emoji: "🥬", region: "North Indian", category: "healthy",
+                calories: 280, protein: 16, carbs: 10, fat: 20,
+                ingredients: [
+                    { name: "Paneer", amount: "100g", cal: 177, icon: "🧀" },
+                    { name: "Spinach", amount: "150g", cal: 35, icon: "🥬" },
+                    { name: "Cream", amount: "30ml", cal: 72, icon: "🥛" },
+                    { name: "Onion Tomato", amount: "80g", cal: 35, icon: "🧅" },
+                    { name: "Spices", amount: "10g", cal: 25, icon: "🌶️" },
+                    { name: "Oil", amount: "10ml", cal: 90, icon: "🫒" }
+                ]
+            },
+            {
+                id: 9, name: "Dal Makhani", emoji: "🥣", region: "Punjabi", category: "north",
+                calories: 350, protein: 14, carbs: 30, fat: 18,
+                ingredients: [
+                    { name: "Black Lentils", amount: "150g", cal: 120, icon: "🫘" },
+                    { name: "Rajma", amount: "50g", cal: 50, icon: "🫘" },
+                    { name: "Butter & Cream", amount: "40g", cal: 280, icon: "🧈" },
+                    { name: "Tomato", amount: "50g", cal: 20, icon: "🍅" },
+                    { name: "Spices", amount: "10g", cal: 25, icon: "🌶️" }
+                ]
+            },
+            {
+                id: 10, name: "Tandoori Roti", emoji: "🍞", region: "North Indian", category: "north",
+                calories: 120, protein: 4, carbs: 24, fat: 1,
+                ingredients: [
+                    { name: "Whole Wheat", amount: "40g", cal: 135, icon: "🌾" },
+                    { name: "Ghee", amount: "3g", cal: 27, icon: "🧈" }
+                ]
+            },
+            {
+                id: 11, name: "Naan", emoji: "🫓", region: "North Indian", category: "north",
+                calories: 260, protein: 6, carbs: 42, fat: 8,
+                ingredients: [
+                    { name: "Refined Flour", amount: "60g", cal: 210, icon: "🌾" },
+                    { name: "Yogurt", amount: "20g", cal: 12, icon: "🥛" },
+                    { name: "Butter", amount: "10g", cal: 72, icon: "🧈" },
+                    { name: "Yeast", amount: "2g", cal: 5, icon: "🧪" }
+                ]
+            },
+            {
+                id: 12, name: "Gulab Jamun", emoji: "🍮", region: "Dessert", category: "dessert",
+                calories: 150, protein: 2, carbs: 25, fat: 6,
+                ingredients: [
+                    { name: "Mawa/Khoya", amount: "40g", cal: 120, icon: "🥛" },
+                    { name: "Sugar Syrup", amount: "30ml", cal: 90, icon: "🍯" },
+                    { name: "Flour", amount: "10g", cal: 35, icon: "🌾" },
+                    { name: "Oil", amount: "5ml", cal: 45, icon: "🫒" }
+                ]
+            },
+            {
+                id: 13, name: "Rasgulla", emoji: "⚪", region: "Bengali", category: "dessert",
+                calories: 80, protein: 3, carbs: 15, fat: 1,
+                ingredients: [
+                    { name: "Chhena", amount: "40g", cal: 60, icon: "🧀" },
+                    { name: "Sugar Syrup", amount: "20ml", cal: 60, icon: "🍯" },
+                    { name: "Semolina", amount: "5g", cal: 18, icon: "🌾" }
+                ]
+            },
+            {
+                id: 14, name: "Vada Pav", emoji: "🍔", region: "Mumbai Street", category: "street",
+                calories: 310, protein: 6, carbs: 42, fat: 14,
+                ingredients: [
+                    { name: "Pav Bun", amount: "60g", cal: 180, icon: "🍞" },
+                    { name: "Potato Vada", amount: "80g", cal: 160, icon: "🥔" },
+                    { name: "Chutneys", amount: "20g", cal: 40, icon: "🌿" },
+                    { name: "Oil", amount: "10ml", cal: 90, icon: "🫒" }
+                ]
+            },
+            {
+                id: 15, name: "Pani Puri (6 pcs)", emoji: "🥠", region: "Street Food", category: "street",
+                calories: 180, protein: 3, carbs: 28, fat: 7,
+                ingredients: [
+                    { name: "Puri Shells", amount: "30g", cal: 130, icon: "🌾" },
+                    { name: "Potato Filling", amount: "60g", cal: 50, icon: "🥔" },
+                    { name: "Tamarind Water", amount: "100ml", cal: 30, icon: "🥣" },
+                    { name: "Chickpeas", amount: "30g", cal: 35, icon: "🫘" }
+                ]
+            },
+            {
+                id: 16, name: "Dhokla", emoji: "🍞", region: "Gujarati", category: "healthy",
+                calories: 150, protein: 6, carbs: 22, fat: 4,
+                ingredients: [
+                    { name: "Besan", amount: "50g", cal: 180, icon: "🌾" },
+                    { name: "Yogurt", amount: "20g", cal: 12, icon: "🥛" },
+                    { name: "Tempering", amount: "10g", cal: 90, icon: "🫒" },
+                    { name: "Sugar", amount: "10g", cal: 40, icon: "🍯" }
+                ]
+            },
+            {
+                id: 17, name: "Pav Bhaji", emoji: "🍛", region: "Mumbai", category: "street",
+                calories: 400, protein: 8, carbs: 55, fat: 16,
+                ingredients: [
+                    { name: "Pav (2)", amount: "80g", cal: 240, icon: "🍞" },
+                    { name: "Mixed Vegetables", amount: "150g", cal: 80, icon: "🥕" },
+                    { name: "Butter", amount: "20g", cal: 143, icon: "🧈" },
+                    { name: "Masala", amount: "15g", cal: 40, icon: "🌶️" }
+                ]
+            },
+            {
+                id: 18, name: "Mango Lassi", emoji: "🥭", region: "Punjabi", category: "beverage",
+                calories: 220, protein: 6, carbs: 35, fat: 6,
+                ingredients: [
+                    { name: "Yogurt", amount: "200g", cal: 120, icon: "🥛" },
+                    { name: "Mango Pulp", amount: "100g", cal: 80, icon: "🥭" },
+                    { name: "Sugar", amount: "15g", cal: 60, icon: "🍯" },
+                    { name: "Cardamom", amount: "2g", cal: 5, icon: "🌸" }
+                ]
+            },
+            {
+                id: 19, name: "Chai (Masala Tea)", emoji: "☕", region: "All India", category: "beverage",
+                calories: 80, protein: 2, carbs: 10, fat: 3,
+                ingredients: [
+                    { name: "Milk", amount: "150ml", cal: 90, icon: "🥛" },
+                    { name: "Sugar", amount: "10g", cal: 40, icon: "🍯" },
+                    { name: "Tea Leaves", amount: "3g", cal: 2, icon: "🍃" },
+                    { name: "Spices", amount: "2g", cal: 5, icon: "🌶️" }
+                ]
+            },
+            {
+                id: 20, name: "Rajma Chawal", emoji: "🍛", region: "North Indian", category: "north",
+                calories: 380, protein: 14, carbs: 58, fat: 10,
+                ingredients: [
+                    { name: "Rice", amount: "150g", cal: 195, icon: "🍚" },
+                    { name: "Rajma", amount: "120g", cal: 120, icon: "🫘" },
+                    { name: "Onion Tomato Gravy", amount: "80g", cal: 50, icon: "🍅" },
+                    { name: "Oil", amount: "10ml", cal: 90, icon: "🫒" },
+                    { name: "Spices", amount: "10g", cal: 25, icon: "🌶️" }
+                ]
+            },
+            {
+                id: 21, name: "Aloo Paratha", emoji: "🫓", region: "Punjabi", category: "north",
+                calories: 320, protein: 6, carbs: 45, fat: 12,
+                ingredients: [
+                    { name: "Wheat Dough", amount: "80g", cal: 270, icon: "🌾" },
+                    { name: "Potato Filling", amount: "80g", cal: 65, icon: "🥔" },
+                    { name: "Butter/Ghee", amount: "15g", cal: 135, icon: "🧈" },
+                    { name: "Spices", amount: "5g", cal: 10, icon: "🌶️" }
+                ]
+            },
+            {
+                id: 22, name: "Fish Curry", emoji: "🐟", region: "Coastal", category: "healthy",
+                calories: 250, protein: 22, carbs: 8, fat: 14,
+                ingredients: [
+                    { name: "Fish", amount: "150g", cal: 165, icon: "🐟" },
+                    { name: "Coconut Milk", amount: "50ml", cal: 90, icon: "🥥" },
+                    { name: "Onion Tomato", amount: "80g", cal: 35, icon: "🧅" },
+                    { name: "Oil", amount: "10ml", cal: 90, icon: "🫒" },
+                    { name: "Spices", amount: "10g", cal: 25, icon: "🌶️" }
+                ]
+            },
+            {
+                id: 23, name: "Dosa (Plain)", emoji: "🥞", region: "South Indian", category: "south",
+                calories: 180, protein: 4, carbs: 32, fat: 5,
+                ingredients: [
+                    { name: "Rice Batter", amount: "120g", cal: 135, icon: "🍚" },
+                    { name: "Urad Dal", amount: "40g", cal: 48, icon: "🫘" },
+                    { name: "Oil", amount: "10ml", cal: 90, icon: "🫒" },
+                    { name: "Coconut Chutney", amount: "20g", cal: 40, icon: "🥥" }
+                ]
+            },
+            {
+                id: 24, name: "Upma", emoji: "🥣", region: "South Indian", category: "south",
+                calories: 220, protein: 6, carbs: 35, fat: 6,
+                ingredients: [
+                    { name: "Semolina", amount: "60g", cal: 210, icon: "🌾" },
+                    { name: "Vegetables", amount: "50g", cal: 20, icon: "🥕" },
+                    { name: "Tempering", amount: "10g", cal: 90, icon: "🫒" },
+                    { name: "Cashews", amount: "10g", cal: 57, icon: "🥜" }
+                ]
+            }
+        ];
+
+        // ==================== STATE ====================
+        let loggedMeals = JSON.parse(localStorage.getItem('svarna_meals')) || [];
+        let waterIntake = parseInt(localStorage.getItem('svarna_water')) || 0;
+
+        // ==================== INIT ====================
+        document.addEventListener('DOMContentLoaded', () => {
+            createParticles();
+            initWaterTracker();
+            renderFoods('all');
+            updateDashboard();
+            initScrollReveal();
+            initNavScroll();
+            initSearch();
+            initFilters();
+        });
+
+        // ==================== PARTICLES ====================
+        function createParticles() {
+            const container = document.getElementById('particles');
+            for (let i = 0; i < 30; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 15 + 's';
+                particle.style.animationDuration = (10 + Math.random() * 10) + 's';
+                container.appendChild(particle);
+            }
+        }
+
+        // ==================== WATER TRACKER ====================
+        function initWaterTracker() {
+            const container = document.getElementById('waterCups');
+            container.innerHTML = '';
+            for (let i = 0; i < 8; i++) {
+                const cup = document.createElement('div');
+                cup.className = 'water-cup' + (i < waterIntake ? ' filled' : '');
+                cup.onclick = () => toggleWater(i);
+                container.appendChild(cup);
+            }
+            document.getElementById('waterCount').textContent = waterIntake;
+        }
+
+        function toggleWater(index) {
+            if (index < waterIntake) {
+                waterIntake = index;
+            } else {
+                waterIntake = index + 1;
+            }
+            localStorage.setItem('svarna_water', waterIntake);
+            initWaterTracker();
+        }
+
+        // ==================== FOOD GRID ====================
+        function renderFoods(filter, searchTerm = '') {
+            const grid = document.getElementById('foodGrid');
+            grid.innerHTML = '';
+
+            let foods = indianFoods;
+            if (filter !== 'all') {
+                foods = foods.filter(f => f.category === filter);
+            }
+            if (searchTerm) {
+                const term = searchTerm.toLowerCase();
+                foods = foods.filter(f => 
+                    f.name.toLowerCase().includes(term) ||
+                    f.region.toLowerCase().includes(term) ||
+                    f.ingredients.some(i => i.name.toLowerCase().includes(term))
+                );
+            }
+
+            foods.forEach((food, index) => {
+                const card = document.createElement('div');
+                card.className = 'food-card';
+                card.style.animationDelay = (index * 0.05) + 's';
+                card.innerHTML = `
+                    <div class="food-image">
+                        <span style="font-size: 4rem;">${food.emoji}</span>
+                        <div class="food-calorie-badge">${food.calories} kcal</div>
+                    </div>
+                    <div class="food-info">
+                        <div class="food-name">${food.name}</div>
+                        <div class="food-region">
+                            <i class="fas fa-map-marker-alt" style="color: var(--gold);"></i>
+                            ${food.region}
+                        </div>
+                        <div class="food-macros">
+                            <div class="food-macro">
+                                <div class="food-macro-value" style="color: var(--red);">${food.protein}g</div>
+                                <div class="food-macro-label">Protein</div>
+                            </div>
+                            <div class="food-macro">
+                                <div class="food-macro-value" style="color: var(--emerald);">${food.carbs}g</div>
+                                <div class="food-macro-label">Carbs</div>
+                            </div>
+                            <div class="food-macro">
+                                <div class="food-macro-value" style="color: var(--purple);">${food.fat}g</div>
+                                <div class="food-macro-label">Fat</div>
+                            </div>
+                        </div>
+                        <div class="food-actions">
+                            <button class="btn-small btn-add" onclick="addToLog(${food.id})">
+                                <i class="fas fa-plus"></i> Add
+                            </button>
+                            <button class="btn-small btn-details" onclick="showDetails(${food.id})">
+                                <i class="fas fa-info"></i> Details
+                            </button>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function initSearch() {
+            const searchInput = document.getElementById('foodSearch');
+            let timeout;
+            searchInput.addEventListener('input', (e) => {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => {
+                    const activeFilter = document.querySelector('.filter-tag.active');
+                    const filter = activeFilter ? activeFilter.dataset.filter : 'all';
+                    renderFoods(filter, e.target.value);
+                }, 300);
+            });
+        }
+
+        function initFilters() {
+            const tags = document.querySelectorAll('.filter-tag');
+            tags.forEach(tag => {
+                tag.addEventListener('click', () => {
+                    tags.forEach(t => t.classList.remove('active'));
+                    tag.classList.add('active');
+                    const searchInput = document.getElementById('foodSearch');
+                    renderFoods(tag.dataset.filter, searchInput.value);
+                });
+            });
+        }
+
+        // ==================== MEAL LOG ====================
+        function addToLog(foodId) {
+            const food = indianFoods.find(f => f.id === foodId);
+            if (!food) return;
+
+            const meal = {
+                id: Date.now(),
+                foodId: food.id,
+                name: food.name,
+                calories: food.calories,
+                protein: food.protein,
+                carbs: food.carbs,
+                fat: food.fat,
+                time: new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
+            };
+
+            loggedMeals.push(meal);
+            localStorage.setItem('svarna_meals', JSON.stringify(loggedMeals));
+            updateDashboard();
+            showNotification(`Added ${food.name} to your log!`);
+        }
+
+        function removeFromLog(mealId) {
+            loggedMeals = loggedMeals.filter(m => m.id !== mealId);
+            localStorage.setItem('svarna_meals', JSON.stringify(loggedMeals));
+            updateDashboard();
+            showNotification('Meal removed from log');
+        }
+
+        function updateDashboard() {
+            const totalCal = loggedMeals.reduce((sum, m) => sum + m.calories, 0);
+            const totalProtein = loggedMeals.reduce((sum, m) => sum + m.protein, 0);
+            const totalCarbs = loggedMeals.reduce((sum, m) => sum + m.carbs, 0);
+            const totalFat = loggedMeals.reduce((sum, m) => sum + m.fat, 0);
+
+            // Update circular progress
+            const calValue = document.getElementById('calValue');
+            const calRemaining = document.getElementById('calRemaining');
+            const calProgress = document.getElementById('calProgress');
+
+            calValue.textContent = totalCal;
+            calRemaining.textContent = Math.max(0, 2000 - totalCal);
+
+            const percent = Math.min(totalCal / 2000, 1);
+            const circumference = 440;
+            const offset = circumference - (percent * circumference);
+            calProgress.style.strokeDashoffset = offset;
+
+            // Update macros
+            document.getElementById('proteinVal').textContent = totalProtein;
+            document.getElementById('carbsVal').textContent = totalCarbs;
+            document.getElementById('fatVal').textContent = totalFat;
+
+            document.getElementById('proteinBar').style.width = Math.min((totalProtein / 150) * 100, 100) + '%';
+            document.getElementById('carbsBar').style.width = Math.min((totalCarbs / 250) * 100, 100) + '%';
+            document.getElementById('fatBar').style.width = Math.min((totalFat / 65) * 100, 100) + '%';
+
+            // Update stats
+            document.getElementById('mealsCount').textContent = loggedMeals.length;
+            document.getElementById('avgCal').textContent = loggedMeals.length > 0 ? Math.round(totalCal / loggedMeals.length) : 0;
+
+            // Update meal log
+            const logContainer = document.getElementById('mealLog');
+            if (loggedMeals.length === 0) {
+                logContainer.innerHTML = `
+                    <div style="text-align: center; padding: 4rem; color: var(--gray);">
+                        <i class="fas fa-bowl-food" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                        <p>No meals logged yet. Add some food from the Explore section!</p>
+                    </div>
+                `;
+            } else {
+                logContainer.innerHTML = loggedMeals.slice().reverse().map(meal => `
+                    <div class="meal-item">
+                        <div class="meal-time">
+                            <div class="meal-time-hour">${meal.time.split(' ')[0]}</div>
+                            <div class="meal-time-ampm">${meal.time.split(' ')[1]}</div>
+                        </div>
+                        <div class="meal-details">
+                            <div class="meal-name">${meal.name}</div>
+                            <div class="meal-calories">${meal.calories} kcal · P:${meal.protein}g C:${meal.carbs}g F:${meal.fat}g</div>
+                        </div>
+                        <div class="meal-delete" onclick="removeFromLog(${meal.id})">
+                            <i class="fas fa-trash"></i>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        // ==================== MODAL ====================
+        function showDetails(foodId) {
+            const food = indianFoods.find(f => f.id === foodId);
+            if (!food) return;
+
+            const modal = document.getElementById('modal');
+            const content = document.getElementById('modalContent');
+
+            content.innerHTML = `
+                <div style="text-align: center; margin-bottom: 2rem;">
+                    <div style="font-size: 5rem; margin-bottom: 1rem;">${food.emoji}</div>
+                    <h2 class="modal-title">${food.name}</h2>
+                    <p class="modal-subtitle">${food.region} · ${food.calories} kcal per serving</p>
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 2rem;">
+                    <div style="text-align: center; padding: 1rem; background: rgba(255,51,102,0.05); border-radius: 12px; border: 1px solid rgba(255,51,102,0.1);">
+                        <div style="font-size: 1.5rem; font-weight: 700; color: var(--red);">${food.protein}g</div>
+                        <div style="font-size: 0.8rem; color: var(--gray);">Protein</div>
+                    </div>
+                    <div style="text-align: center; padding: 1rem; background: rgba(0,217,165,0.05); border-radius: 12px; border: 1px solid rgba(0,217,165,0.1);">
+                        <div style="font-size: 1.5rem; font-weight: 700; color: var(--emerald);">${food.carbs}g</div>
+                        <div style="font-size: 0.8rem; color: var(--gray);">Carbs</div>
+                    </div>
+                    <div style="text-align: center; padding: 1rem; background: rgba(168,85,247,0.05); border-radius: 12px; border: 1px solid rgba(168,85,247,0.1);">
+                        <div style="font-size: 1.5rem; font-weight: 700; color: var(--purple);">${food.fat}g</div>
+                        <div style="font-size: 0.8rem; color: var(--gray);">Fat</div>
+                    </div>
+                </div>
+
+                <h3 style="font-size: 1.1rem; margin-bottom: 1rem; color: var(--gold);">
+                    <i class="fas fa-list"></i> Ingredient Breakdown
+                </h3>
+                <div class="ingredient-list">
+                    ${food.ingredients.map(ing => `
+                        <div class="ingredient-item">
+                            <div class="ingredient-icon" style="background: rgba(255,215,0,0.1);">${ing.icon}</div>
+                            <div class="ingredient-info">
+                                <div class="ingredient-name">${ing.name}</div>
+                                <div class="ingredient-amount">${ing.amount}</div>
+                            </div>
+                            <div class="ingredient-cal">${ing.cal} kcal</div>
+                        </div>
+                    `).join('')}
+                </div>
+
+                <div style="margin-top: 2rem; padding: 1rem; background: rgba(255,215,0,0.05); border-radius: 12px; border: 1px solid rgba(255,215,0,0.1);">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-weight: 600;">Total Calories</span>
+                        <span style="font-size: 1.5rem; font-weight: 700; color: var(--gold);">${food.calories} kcal</span>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary" style="width: 100%; margin-top: 1.5rem; justify-content: center;" onclick="addToLog(${food.id}); closeModal();">
+                    <i class="fas fa-plus"></i> Add to Log
+                </button>
+            `;
+
+            modal.classList.add('active');
+        }
+
+        function closeModal(e) {
+            if (!e || e.target.id === 'modal') {
+                document.getElementById('modal').classList.remove('active');
+            }
+        }
+
+        // ==================== AI FEATURES ====================
+        function estimateCalories() {
+            const input = document.getElementById('aiEstimateInput').value;
+            const result = document.getElementById('estimateResult');
+
+            if (!input.trim()) {
+                showNotification('Please describe your meal first!');
+                return;
+            }
+
+            result.innerHTML = '<div class="loading-dots"><div class="loading-dot"></div><div class="loading-dot"></div><div class="loading-dot"></div></div>';
+            result.classList.add('show');
+
+            setTimeout(() => {
+                // Simple estimation logic based on keywords
+                let estCal = 0, estPro = 0, estCarb = 0, estFat = 0;
+                const text = input.toLowerCase();
+
+                if (text.includes('roti') || text.includes('chapati')) { estCal += 120; estCarb += 24; estPro += 4; }
+                if (text.includes('rice') || text.includes('chawal')) { estCal += 200; estCarb += 45; estPro += 4; }
+                if (text.includes('dal') || text.includes('lentil')) { estCal += 150; estCarb += 20; estPro += 10; estFat += 5; }
+                if (text.includes('chicken') || text.includes('murgh')) { estCal += 250; estPro += 30; estFat += 12; }
+                if (text.includes('paneer')) { estCal += 265; estPro += 18; estFat += 20; }
+                if (text.includes('vegetable') || text.includes('sabzi')) { estCal += 100; estCarb += 15; estPro += 3; estFat += 4; }
+                if (text.includes('curd') || text.includes('yogurt') || text.includes('raita')) { estCal += 60; estCarb += 5; estPro += 4; estFat += 3; }
+                if (text.includes('ghee') || text.includes('butter')) { estCal += 100; estFat += 12; }
+                if (text.includes('sweet') || text.includes('dessert')) { estCal += 200; estCarb += 30; estFat += 8; }
+
+                if (estCal === 0) { estCal = 400; estPro = 15; estCarb = 50; estFat = 15; }
+
+                result.innerHTML = `
+                    <div style="text-align: center; margin-bottom: 1.5rem;">
+                        <div style="font-size: 2.5rem; font-weight: 700; color: var(--gold); font-family: 'Playfair Display', serif;">${estCal} kcal</div>
+                        <div style="color: var(--gray); font-size: 0.9rem;">Estimated for "${input}"</div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;">
+                        <div style="text-align: center; padding: 1rem; background: rgba(255,51,102,0.05); border-radius: 10px;">
+                            <div style="font-weight: 700; color: var(--red);">${estPro}g</div>
+                            <div style="font-size: 0.8rem; color: var(--gray);">Protein</div>
+                        </div>
+                        <div style="text-align: center; padding: 1rem; background: rgba(0,217,165,0.05); border-radius: 10px;">
+                            <div style="font-weight: 700; color: var(--emerald);">${estCarb}g</div>
+                            <div style="font-size: 0.8rem; color: var(--gray);">Carbs</div>
+                        </div>
+                        <div style="text-align: center; padding: 1rem; background: rgba(168,85,247,0.05); border-radius: 10px;">
+                            <div style="font-weight: 700; color: var(--purple);">${estFat}g</div>
+                            <div style="font-size: 0.8rem; color: var(--gray);">Fat</div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 1.5rem; padding: 1rem; background: rgba(255,215,0,0.05); border-radius: 10px; font-size: 0.9rem; color: var(--gray);">
+                        <i class="fas fa-info-circle" style="color: var(--gold);"></i> 
+                        This is an AI estimate based on portion analysis. For precise tracking, add individual items from our database.
+                    </div>
+                `;
+            }, 1500);
+        }
+
+        function suggestMeals() {
+            const remaining = parseInt(document.getElementById('aiSuggestInput').value) || 800;
+            const result = document.getElementById('suggestResult');
+
+            result.innerHTML = '<div class="loading-dots"><div class="loading-dot"></div><div class="loading-dot"></div><div class="loading-dot"></div></div>';
+            result.classList.add('show');
+
+            setTimeout(() => {
+                const suggestions = indianFoods.filter(f => f.calories <= remaining).sort(() => Math.random() - 0.5).slice(0, 3);
+
+                if (suggestions.length === 0) {
+                    result.innerHTML = `<div style="text-align: center; color: var(--gray);">No meals found under ${remaining} kcal. Try increasing your limit!</div>`;
+                    return;
+                }
+
+                result.innerHTML = `
+                    <div style="margin-bottom: 1rem; font-weight: 600; color: var(--gold);">
+                        <i class="fas fa-lightbulb"></i> Suggestions for ${remaining} kcal remaining
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 0.8rem;">
+                        ${suggestions.map(food => `
+                            <div style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: rgba(255,255,255,0.03); border-radius: 12px; border: 1px solid rgba(255,215,0,0.1); cursor: pointer; transition: all 0.3s;" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='rgba(255,215,0,0.1)'" onclick="addToLog(${food.id}); showNotification('Added ${food.name}!');">
+                                <div style="font-size: 2rem;">${food.emoji}</div>
+                                <div style="flex: 1;">
+                                    <div style="font-weight: 600;">${food.name}</div>
+                                    <div style="font-size: 0.8rem; color: var(--gray);">${food.region}</div>
+                                </div>
+                                <div style="font-weight: 700; color: var(--gold);">${food.calories} kcal</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }, 1200);
+        }
+
+        function analyzeIngredients() {
+            const input = document.getElementById('aiIngredientInput').value;
+            const result = document.getElementById('ingredientResult');
+
+            if (!input.trim()) {
+                showNotification('Please enter a dish name!');
+                return;
+            }
+
+            result.innerHTML = '<div class="loading-dots"><div class="loading-dot"></div><div class="loading-dot"></div><div class="loading-dot"></div></div>';
+            result.classList.add('show');
+
+            setTimeout(() => {
+                const food = indianFoods.find(f => f.name.toLowerCase().includes(input.toLowerCase()));
+
+                if (!food) {
+                    result.innerHTML = `
+                        <div style="text-align: center; color: var(--gray);">
+                            <i class="fas fa-search" style="font-size: 2rem; margin-bottom: 0.5rem; opacity: 0.5;"></i>
+                            <p>Dish not found. Try: Butter Chicken, Biryani, Dosa, Samosa...</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                result.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem;">
+                        <div style="font-size: 3rem;">${food.emoji}</div>
+                        <div>
+                            <div style="font-size: 1.2rem; font-weight: 700;">${food.name}</div>
+                            <div style="color: var(--gray); font-size: 0.9rem;">${food.region} · ${food.calories} kcal total</div>
+                        </div>
+                    </div>
+                    <div class="ingredient-list">
+                        ${food.ingredients.map(ing => `
+                            <div class="ingredient-item">
+                                <div class="ingredient-icon" style="background: rgba(255,215,0,0.1);">${ing.icon}</div>
+                                <div class="ingredient-info">
+                                    <div class="ingredient-name">${ing.name}</div>
+                                    <div class="ingredient-amount">${ing.amount}</div>
+                                </div>
+                                <div class="ingredient-cal">${ing.cal} kcal</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div style="margin-top: 1.5rem; padding: 1rem; background: rgba(255,215,0,0.05); border-radius: 12px; text-align: center;">
+                        <div style="font-size: 0.9rem; color: var(--gray);">Total verified calories</div>
+                        <div style="font-size: 1.5rem; font-weight: 700; color: var(--gold);">${food.calories} kcal</div>
+                    </div>
+                `;
+            }, 1000);
+        }
+
+        // ==================== NOTIFICATION ====================
+        function showNotification(text) {
+            const notif = document.getElementById('notification');
+            document.getElementById('notifText').textContent = text;
+            notif.classList.add('show');
+            setTimeout(() => notif.classList.remove('show'), 3000);
+        }
+
+        // ==================== SCROLL REVEAL ====================
+        function initScrollReveal() {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+        }
+
+        // ==================== NAV SCROLL ====================
+        function initNavScroll() {
+            const nav = document.getElementById('navbar');
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 50) {
+                    nav.classList.add('scrolled');
+                } else {
+                    nav.classList.remove('scrolled');
+                }
+            });
+
+            // Smooth scroll for nav links
+            document.querySelectorAll('.nav-links a').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const target = document.querySelector(link.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({ behavior: 'smooth' });
+                        document.querySelectorAll('.nav-links a').forEach(l => l.classList.remove('active'));
+                        link.classList.add('active');
+                    }
+                });
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PromptCraft — Universal AI Prompt Writer</title>
+  <meta name="description" content="Write perfect AI prompts for Claude, Gemini, GPT, Groq, OpenRouter and more. Free, open source, runs in your browser."/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="css/style.css"/>
+</head>
+<body data-provider="claude">
+
+<!-- ════════════════════════════════════════
+     NAV
+═══════════════════════════════════════════ -->
+<nav class="nav">
+  <a href="#" class="nav-brand">
+    <span class="brand-mark">PC</span>
+    <span class="brand-name">PromptCraft</span>
+  </a>
+  <div class="nav-center">
+    <span class="nav-tag">Universal API</span>
+  </div>
+  <div class="nav-right">
+    <a href="https://github.com/yourusername/promptcraft" target="_blank" class="nav-link" id="githubLink">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+      GitHub
+    </a>
+    <button class="btn-key" id="keyBtn" onclick="UI.openKeyModal()">
+      <span class="key-dot" id="keyDot"></span>
+      <span id="keyBtnText">Connect API</span>
+    </button>
+  </div>
+</nav>
+
+<!-- ════════════════════════════════════════
+     HERO
+═══════════════════════════════════════════ -->
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-eyebrow">Open Source · Free · No Server</div>
+    <h1 class="hero-title">Write prompts that<br/><em>work everywhere</em></h1>
+    <p class="hero-sub">Connect any AI API — Claude, Gemini, Groq, GPT, OpenRouter — and craft model-ready prompts with one click. Your key stays in your browser, always.</p>
+    <div class="hero-actions">
+      <a href="#app" class="btn-primary">Start writing prompts</a>
+      <a href="https://github.com/yourusername/promptcraft" target="_blank" class="btn-ghost" id="heroGithub">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+        View on GitHub
+      </a>
+    </div>
+    <div class="provider-pills">
+      <span class="pill pill-claude">Claude</span>
+      <span class="pill pill-gemini">Gemini</span>
+      <span class="pill pill-groq">Groq</span>
+      <span class="pill pill-openai">GPT</span>
+      <span class="pill pill-openrouter">OpenRouter</span>
+      <span class="pill pill-custom">+ Any API</span>
+    </div>
+  </div>
+  <div class="hero-glow"></div>
+</section>
+
+<!-- ════════════════════════════════════════
+     FEATURES
+═══════════════════════════════════════════ -->
+<section class="features">
+  <div class="features-grid">
+    <div class="feat">
+      <div class="feat-icon">⚡</div>
+      <h3>Works with any API</h3>
+      <p>Plug in Claude, Gemini, Groq, OpenRouter, or any OpenAI-compatible endpoint. Switch providers in seconds.</p>
+    </div>
+    <div class="feat">
+      <div class="feat-icon">🔐</div>
+      <h3>Zero server, full privacy</h3>
+      <p>Your API key lives in your browser's localStorage. Calls go directly from your browser to the AI provider.</p>
+    </div>
+    <div class="feat">
+      <div class="feat-icon">✦</div>
+      <h3>Smart variations</h3>
+      <p>Every generation returns a main prompt plus two meaningfully different variations — not just paraphrases.</p>
+    </div>
+    <div class="feat">
+      <div class="feat-icon">📂</div>
+      <h3>Open source</h3>
+      <p>MIT licensed, single HTML file you can self-host anywhere. Fork it, extend it, make it yours.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════
+     APP SHELL
+═══════════════════════════════════════════ -->
+<section class="app-section" id="app">
+  <div class="app-header">
+    <h2 class="app-title">Prompt Generator</h2>
+    <p class="app-sub">Configure your prompt on the left. Output appears on the right.</p>
+  </div>
+
+  <div class="app-shell">
+
+    <!-- ── SIDEBAR ── -->
+    <aside class="sidebar">
+
+      <!-- Provider Selector -->
+      <div class="sidebar-block">
+        <div class="block-label">AI Provider</div>
+        <div class="provider-grid" id="providerGrid">
+          <button class="prov-btn active" data-provider="claude" onclick="Providers.select('claude', this)">
+            <span class="prov-dot" style="background:#a78bfa"></span>Claude
+          </button>
+          <button class="prov-btn" data-provider="gemini" onclick="Providers.select('gemini', this)">
+            <span class="prov-dot" style="background:#34d399"></span>Gemini
+          </button>
+          <button class="prov-btn" data-provider="groq" onclick="Providers.select('groq', this)">
+            <span class="prov-dot" style="background:#fb923c"></span>Groq
+          </button>
+          <button class="prov-btn" data-provider="openai" onclick="Providers.select('openai', this)">
+            <span class="prov-dot" style="background:#60a5fa"></span>GPT / OpenAI
+          </button>
+          <button class="prov-btn" data-provider="openrouter" onclick="Providers.select('openrouter', this)">
+            <span class="prov-dot" style="background:#f472b6"></span>OpenRouter
+          </button>
+          <button class="prov-btn" data-provider="custom" onclick="Providers.select('custom', this)">
+            <span class="prov-dot" style="background:#94a3b8"></span>Custom
+          </button>
+        </div>
+      </div>
+
+      <!-- Model -->
+      <div class="sidebar-block">
+        <div class="block-label">Model</div>
+        <select id="modelSelect" class="field-input"></select>
+      </div>
+
+      <!-- Goal -->
+      <div class="sidebar-block">
+        <div class="block-label">Your goal</div>
+        <textarea id="goalInput" class="field-input" rows="4" placeholder="e.g. Write a cold email to a startup founder asking for a 15-min call about a partnership opportunity…"></textarea>
+      </div>
+
+      <!-- Prompt Type -->
+      <div class="sidebar-block">
+        <div class="block-label">Prompt type</div>
+        <div class="chip-group" id="typeChips">
+          <button class="chip active" data-v="General">General</button>
+          <button class="chip" data-v="Creative Writing">Creative</button>
+          <button class="chip" data-v="Coding">Coding</button>
+          <button class="chip" data-v="Research">Research</button>
+          <button class="chip" data-v="Business">Business</button>
+          <button class="chip" data-v="Marketing">Marketing</button>
+          <button class="chip" data-v="Education">Education</button>
+          <button class="chip" data-v="Image Gen">Image Gen</button>
+        </div>
+      </div>
+
+      <!-- Tone -->
+      <div class="sidebar-block">
+        <div class="block-label">Tone</div>
+        <div class="chip-group" id="toneChips">
+          <button class="chip active" data-v="Professional">Professional</button>
+          <button class="chip" data-v="Casual">Casual</button>
+          <button class="chip" data-v="Creative">Creative</button>
+          <button class="chip" data-v="Technical">Technical</button>
+          <button class="chip" data-v="Persuasive">Persuasive</button>
+          <button class="chip" data-v="Concise">Concise</button>
+        </div>
+      </div>
+
+      <!-- Detail -->
+      <div class="sidebar-block">
+        <div class="block-label">Detail level</div>
+        <div class="chip-group" id="detailChips">
+          <button class="chip" data-v="Brief">Brief</button>
+          <button class="chip active" data-v="Balanced">Balanced</button>
+          <button class="chip" data-v="Detailed">Detailed</button>
+          <button class="chip" data-v="Step-by-step">Step-by-step</button>
+        </div>
+      </div>
+
+      <!-- Context -->
+      <div class="sidebar-block">
+        <div class="block-label">Extra context <span class="optional">(optional)</span></div>
+        <textarea id="ctxInput" class="field-input" rows="2" placeholder="Audience, constraints, examples, special instructions…"></textarea>
+      </div>
+
+      <button class="generate-btn" id="genBtn" onclick="App.generate()">
+        <span id="genBtnText">✦ Generate Prompt</span>
+      </button>
+      <p class="kbd-hint">Ctrl + Enter to generate</p>
+
+    </aside>
+
+    <!-- ── OUTPUT ── -->
+    <div class="output-panel">
+
+      <div class="output-bar">
+        <div class="status-row">
+          <span class="status-dot" id="statusDot"></span>
+          <span class="status-text" id="statusText">Connect an API key to get started</span>
+        </div>
+        <div class="output-actions" id="outputActions" style="display:none">
+          <button class="action-btn" onclick="App.copyMain()" id="copyMainBtn">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+            Copy
+          </button>
+          <button class="action-btn" onclick="App.clear()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg>
+            Clear
+          </button>
+        </div>
+      </div>
+
+      <div class="output-body" id="outputBody">
+
+        <!-- Placeholder -->
+        <div class="placeholder" id="placeholder">
+          <div class="ph-symbol">✦</div>
+          <div class="ph-title">Your prompt appears here</div>
+          <div class="ph-desc">Fill in the form and hit Generate Prompt</div>
+        </div>
+
+        <!-- Result (hidden until generated) -->
+        <div id="result" style="display:none">
+
+          <div class="result-card" id="mainCard">
+            <div class="result-card-head">
+              <span class="card-label">Main Prompt</span>
+              <button class="copy-chip" id="mainCopy" onclick="App.copyMain()">Copy</button>
+            </div>
+            <div class="result-card-body" id="mainText"></div>
+          </div>
+
+          <div id="varSection" style="display:none; margin-top:16px">
+            <div class="var-label-row">Variations — click to copy</div>
+            <div class="var-grid" id="varGrid"></div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════
+     HOW IT WORKS
+═══════════════════════════════════════════ -->
+<section class="how-section">
+  <h2 class="how-title">Get started in 3 steps</h2>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <h3>Get a free API key</h3>
+      <p>Google Gemini and Groq are 100% free with no credit card. Just sign up and copy your key.</p>
+      <div class="step-links">
+        <a href="https://aistudio.google.com" target="_blank" class="step-link">Gemini (free) →</a>
+        <a href="https://console.groq.com" target="_blank" class="step-link">Groq (free) →</a>
+        <a href="https://openrouter.ai" target="_blank" class="step-link">OpenRouter →</a>
+      </div>
+    </div>
+    <div class="step-divider"></div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <h3>Connect your provider</h3>
+      <p>Pick your AI provider above, click "Connect API", paste your key. It saves locally — never leaves your browser.</p>
+    </div>
+    <div class="step-divider"></div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <h3>Generate & copy</h3>
+      <p>Describe your goal, pick tone and type, click Generate. Copy the main prompt or a variation in one click.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════
+     FOOTER
+═══════════════════════════════════════════ -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <span class="brand-mark sm">PC</span>
+      <span>PromptCraft</span>
+    </div>
+    <div class="footer-links">
+      <a href="https://github.com/yourusername/promptcraft" target="_blank" id="footerGithub">GitHub</a>
+      <a href="https://aistudio.google.com" target="_blank">Gemini API (free)</a>
+      <a href="https://console.groq.com" target="_blank">Groq API (free)</a>
+      <a href="https://openrouter.ai" target="_blank">OpenRouter</a>
+    </div>
+    <div class="footer-copy">MIT License · Your key never leaves your browser</div>
+  </div>
+</footer>
+
+<!-- ════════════════════════════════════════
+     API KEY MODAL
+═══════════════════════════════════════════ -->
+<div class="modal-overlay" id="modalOverlay" onclick="UI.handleOverlay(event)">
+  <div class="modal" id="modal">
+    <div class="modal-head">
+      <div>
+        <h3 id="modalTitle">Connect Claude API</h3>
+        <p id="modalSub">Your key is stored in localStorage and never sent to any server.</p>
+      </div>
+      <button class="modal-close" onclick="UI.closeKeyModal()">✕</button>
+    </div>
+
+    <div class="modal-body">
+      <div class="modal-field">
+        <label class="field-label-sm">API Key</label>
+        <div class="key-input-wrap">
+          <input type="password" id="keyInput" class="field-input" placeholder="Paste your API key here…" autocomplete="off"/>
+          <button class="key-toggle" onclick="UI.toggleKeyVis()" id="keyToggle">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="modal-field" id="customUrlField" style="display:none">
+        <label class="field-label-sm">Base URL</label>
+        <input type="text" id="customUrl" class="field-input" placeholder="https://api.yourprovider.com/v1"/>
+      </div>
+
+      <div class="modal-note" id="modalNote"></div>
+
+      <div class="modal-actions">
+        <button class="btn-ghost sm" onclick="UI.clearKey()">Remove key</button>
+        <button class="btn-primary sm" onclick="UI.saveKey()">Save & Connect</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script src="js/providers.js"></script>
+<script src="js/app.js"></script>
+<script src="js/ui.js"></script>
+</body>
+</html>
